@@ -1,0 +1,511 @@
+\documentclass[titlepage]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[T2A]{fontenc}
+\usepackage{titling}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{graphicx} %package to manage images
+\graphicspath{ {./images/} }
+\usepackage[rightcaption]{sidecap}
+\usepackage{wrapfig}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\begin{document}
+\begin{titlepage}
+\centering
+{\bfseries\LARGE Universidad Católica de Valparaíso \par}
+\vspace{1cm}
+{\scshape\Large Escuela de Ingeniería Mecánica \par}
+\vspace{3cm}
+{\scshape\Huge Demostración Ecuación de Difusión \par}
+\vspace{3cm}
+{\Large Profesor: \par}
+{\Large Cristóbal Galleguillos \par}
+\vspace{1cm}
+{\Large Autor: \par}
+{\Large Christian Flores Navarrete \par}
+\vfill
+{\small Diciembre 2022 \par}
+\end{titlepage}
+%\lhead[\leftmark]{Christian Flores N.}
+\rhead[\rightmark]{Christian Flores}
+\tableofcontents{}
+\listoffigures{}
+\newpage
+\section{Introducción}
+En este informe se demostrarán las ecuaciones de conduccion difución vistas en clases. Cada una tiene por particularidad depender de la anterior. Se comenzará por demostrar la ecuacion de conduccion en distintas coordenadas. Luego se debe discretizar la ecuacion incluyendo el timepo y generación. Finalmente se demostrará el comportamiento de la constante de conductividad en la interfase y Schemes EDS.
+\newpage
+\section{Desarrollo}
+Se comenzará realizando una demostración de la ecuación de Fourier para la conducción de calor. Este procedimiento se dará para coordenadas cartesianas, esféricas y cilíndricas.
+\newline   
+Además, se considerará un volumen de control para el cual se establecerán las condiciones de trabajo. 
+EL volumen de control(VC) considerado tendrá una composicion isotrópica, por lo que la conducción del calor se dará en las mismas condiciones en todos los sentidos del VC.
+\newline
+\begin{figure}[h]
+\caption{Volumen de Control}
+\centering
+\includegraphics[width=0.5\textwidth]{volumen de control.png}
+\end{figure}
+\newline
+Además, se considerará que el Volumen de control:
+\vspace{1cm}
+\newline
+-Posee generación interna de calor
+\newline
+-Presenta capacidad de absorción y acumulación de calor
+\newline
+-Presenta transferencia de calor a travéz de todas sus caras.
+\vspace{1cm}
+
+Para comenzar se realiza un análisis en el sistema de coordenadas cartesianas acontinuación.
+\newpage
+\subsection{Coordenadas     Cartesianas}
+    En principio se considera la energía que se genera al interior de Volumen de control como:
+\newline
+\begin{equation} E_{generada}= q_v \cdot dV \end{equation}
+\newline
+donde: 
+\begin{equation} dV = dx\cdot dy\cdot dz \end{equation}
+\newline
+Además, debido a la primera Ley de Newton, se puede considerar que el calor específico a presión constante es:
+\newline
+\begin{equation}
+    C_{p}=\frac{\partial U}{\partial T}
+\end{equation}
+\newline
+La energía acumulada se puede expresar como
+\newline
+\begin{equation}
+E_{acumulada}= m\cdot \frac{C_{p}\cdot\partial T}{\partial t}
+\end{equation}
+\newline
+Y dado que la masa es:
+\newline
+\begin{equation}
+    m=\rho \cdot dV = \rho \cdot dxdydz
+\end{equation}
+\newline
+Se puede obtener una expreción para la energía absorvida y acumulada en el interior del volumen de contol. Esta se muestra a continuación:
+\newline
+\begin{equation}
+E_{acumulada}=\rho \cdot \frac{C_{p}\cdot\partial T}{\partial t}\cdot d_x d_y d_z=\rho \cdot \frac{C_{p}\cdot\partial T}{\partial t}\cdot \Delta_x\Delta_y\Delta_z
+\end{equation}
+\newline
+Luego, Utilizando la Primera Ley de la termodinámica se observa que, por una cara entra energía y por la otra cara  paralela en el Volumen de control, sale energía con distinta magnitud, lo que se explicaría dada la existencia de energía acumulada y de energía interna. Entonces, realizando el respectivo balance, se obtiene:
+\newline
+\begin{equation}
+E_{acumulada}+E_{generada}=\rho \cdot \frac{C_{p}\cdot\partial T}{\partial t}\cdot \Delta_x\Delta_y\Delta_z + q_v \cdot dxdydz 
+\end{equation}
+\newline
+Por lo tanto, despejando la energía acumulada ($E_{acumulada}$), la expresión queda como;
+\newline
+\begin{equation}
+E_{acumulada}=\rho \cdot \frac{C_{p}\cdot\partial T}{\partial t}\cdot \Delta_x\Delta_y\Delta_z =Q_x- Q_{x+\Delta x}+Q_y- Q_{y+\Delta y}+Q_z- Q_{z+\Delta z}-q_v \cdot dx\cdot dy \cdot dz
+\end{equation}
+\newline
+Luego, se tiene que a travéz de aproximaciones de Taylor el término resulta exacto a la primera iteración:
+\newline
+\begin{equation}
+Q_{x+\Delta_x} = Q_x + \frac{\partial Q_x d_x}{\partial x}
+\end{equation}
+\newline
+lo mismo se repite para \begin{equation}
+Q_{z+\Delta_z}    
+\end{equation}
+Y para \begin{equation} Q_{y+\Delta_y} \end{equation}
+\newline
+Reemplazando (9), (10) y (11) en la ecuación (8) y multiplicando por ($\frac{1}{d_xd_yd_z}$)  se obtiene:
+\newline
+\begin{equation}
+\rho C_{p}\cdot \frac{\partial T}{\partial t}\ = - \frac{\partial Q_x d_x}{d_xd_xd_yd_z} -  \frac{\partial Q_y d_y}{d_yd_xd_yd_z} -  \frac{\partial Q_z d_z}{d_zd_xd_yd_z} -q_v
+\end{equation}
+\newline
+Y dada la ecuacion de Fourier
+\begin{equation}
+Q_x    =-\lambda \frac{d_yd_z}{d_x}\cdot \partial_T
+\end{equation}
+\newline
+Reemplazando (13) en (12) y desarrollando, resulta:
+\begin{equation}
+\rho C_{p}\cdot \frac{\partial T}{\partial t}\ = \lambda\cdot(\frac{\partial ^2 T}{\partial x^2} +  \frac{\partial ^2 T}{\partial y^2} +  \frac{\partial ^2 T}{\partial z^2 }) -\dot{q}
+\end{equation}
+\newline
+Resultando entonces:
+\begin{equation}
+    \frac{\rho C_P}{\lambda} \frac{\partial T}{\partial t} =  \frac{\partial^2 T}{\partial x^2}+ \frac{\partial^2 T}{\partial y^2} +  \frac{\partial^2 T}{\partial z^2}-\frac{\dot {q}_v }{\lambda}
+\end{equation}
+
+Por lo que se pudo obtener la ecuación de difusión y transferencia de calor. En este caso con generación y acumulación de energía.
+\newpage
+\subsection{Coordenadas Cilíndricas}
+Se analizará la ecuación de difusión en coordenadas cilíndricas.
+En principio se considera la energía que se genera al interior de Volumen de control como:
+\newline
+\begin{equation} E_{generada}= q_v \cdot rdzdrd\theta \end{equation}
+\newline
+Luego, y dejando de lado las relaciones que no dependen del sistema de coordenadas ya explicados en el punto 2.1, se muestra directamente la relación de energía acumulada ($E_{ulada}$) en términos de la densidad.
+\newline
+\begin{equation} E_{acumulada}=\rho \cdot \frac{C_{p}\cdot\partial T}{\partial t}\cdot rdzdrd\theta \end{equation}
+\newline
+Luego, Utilizando la Primera Ley de la termodinámica, pero esta vez para las coordenadas cilíndricas, se observa que por una cara entra energía y por la otra cara,  paralela en el Volumen de control, sale energía con distinta magnitud. Esto se explicaría dada la existencia de energía acumulada y de energía interna. Entonces, realizando el respectivo balance, se obtiene:
+\newline
+\begin{equation}
+E_{acumulada}+E_{generada}=(\rho \cdot \frac{C_{p}\cdot\partial T}{\partial t} + q_v) \cdot rdzdrd\theta
+\end{equation}
+\newline
+Por lo tanto, despejando la energía acumulada ($E_{acumulada}$), la expresión queda como;
+\newline
+\begin{equation}
+E_{acumulada}=\rho \cdot \frac{C_{p}\cdot\partial T}{\partial t}\cdot rdzdrd\theta =Q_r- Q_{r+ dx}+Q_\theta- Q_{\theta+d\theta}+Q_z- Q_{z+dz}-q_v \cdot rdzdrd\theta
+\end{equation}
+\newline
+Utilizando el mismo método de coordenadas cartesianas, se desarrolla mediante aproximaciones de Taylor a la primera iteración para ambas coordenadas.
+\newline
+\begin{equation}
+Q_{r+d_r} = Q_r + \frac{\partial Q_r d_r}{\partial r}
+\end{equation}
+\newline
+Lo mismo se repite para \begin{equation}
+Q_{z+dz}    
+\end{equation}
+Y para \begin{equation} Q_{\theta+d\theta} \end{equation}
+\newline
+Luego se remmplazan las ecuaciones (20), (21) y (22) en (19), resultando:\newline
+\begin{equation}
+    \rho \cdot \frac{C_{p}\cdot\partial T}{\partial t}\cdot rdzdrd\theta =-\frac{\partial Q_r}{\partial r}dr- \frac{\partial Q_z}{\partial z}dz -\frac{\partial Q_\theta}{\partial \theta}d\theta-q_v \cdot rdzdrd\theta
+\end{equation}\newline
+Se multiplica por ($\frac{1}{rd_rd_zd_\theta}$) y se obtiene: 
+\newline
+\begin{equation}
+   \rho \cdot \frac{C_{p}\cdot\partial T}{\partial t} =-\frac{1}{r}\cdot \frac{\partial Q_r}{\partial r d_zd_\theta}- \frac{1}{r}\cdot\frac{\partial Q_z}{\partial z d_rd_\theta} -\frac{1}{r}\cdot\frac{\partial Q_\theta }{\partial \theta d_rd_z}-q_v
+\end{equation}
+\newline
+Y dada la ecuacion de Fourier\newline
+\begin{equation}
+Q_r    =-\lambda \frac{d_rd_\theta}{d_r}\cdot \partial_T
+\end{equation}
+\newline
+Reemplazando (25) en (26) y desarrollando, resulta:
+\begin{equation}
+    \rho C_p \frac{\partial T}{\partial t}=\frac{\lambda}{r}\cdot\frac{\partial}{\partial r}(r\frac{\partial T}{\partial r})+\frac{\lambda}{r^2}\cdot\frac{\partial ^2 T}{\partial \theta^2}+\lambda\cdot\frac{\partial^2 T}{\partial z^2}-\dot{q_v}
+\end{equation}
+\newline
+Por lo que se pudo obtener la ecuación de difusión y transferencia de calor para coordenadas cilíndricas. En este caso con generación y acumulación de energía.
+\newline
+\begin{equation}
+    \frac{\rho}{\lambda} C_p \frac{\partial T}{\partial t}=\frac{1}{r}\cdot\frac{\partial}{\partial r}(r\frac{\partial T}{\partial r})+\frac{1}{r^2}\cdot\frac{\partial ^2 T}{\partial \theta^2}+1\cdot\frac{\partial^2 T}{\partial z^2}-\frac {\dot{q_v}}{\lambda}
+\end{equation}
+\newpage
+\subsection{Coordenadas Esféricas}
+Por último, se analizará la ecuación de difusión en coordenadas esféricas de una manera distinta.
+Primero se muestran las relaciones entre coordenadas:
+\begin{equation}
+    x=r\cdot cos(\phi) \cdot sen(\theta);
+    y=r\cdot sen(\phi) \cdot cos(\theta);
+    z=r\cdot cos(\theta)
+\end{equation}
+En cada una de las caras del volumen de control, se puede observar que en cualquier direccion del sistema esferico, entra $\dot{Q_r}$, $\dot{Q_\theta}$ y $\dot{Q_\phi}$ y en cada una de las caras externas sale el mismo calor más un diferencial.
+\newline
+Entra
+\begin{equation}
+    \dot{Q_r} 
+\end{equation}
+\begin{equation}
+    \dot{Q_\phi} 
+\end{equation}
+\begin{equation}
+    \dot{Q_\theta} 
+\end{equation}
+Sale:
+\begin{equation}
+    \dot{Q_r} + \dot{Q_{dr}}
+\end{equation}
+\begin{equation}
+    \dot{Q_\phi} + \dot{Q_{d\phi}}
+\end{equation}
+\begin{equation}
+    \dot{Q_\theta} + \dot{Q_{d\theta}}
+\end{equation}
+
+Se hace balance energético, utilizando la energía que entra menos la energía que sale. Además, se le sumará la energía generada interiormente. Esto dará como resultado la energía almacenada,
+\begin{equation}
+    (\dot{Q_r}-\dot{Q_r} + \dot{Q_{dr}})+(\dot{Q_\phi} -\dot{Q_\phi}+ \dot{Q_{d\phi}})+(\dot{Q_\theta}-\dot{Q_\theta} + \dot{Q_{d\theta}}) + \dot{q_v}\cdot dV=\rho\cdot C_p\cdot \frac{dT}{dt}    
+\end{equation}
+Dónde:
+\begin{equation}
+    dV=dr\cdot r\cdot sen(\theta) \cdot d\phi\cdot rd\theta
+\end{equation}
+Desarrollando la expresión anterior, resulta:
+\begin{equation}
+     d\dot{Q_r}+d\dot{Q_\phi} +d\dot{Q_\theta} + \dot{q_v}\cdot dV=\rho\cdot dV \cdot C_p\cdot \frac{dT}{dt}    
+\end{equation}
+Luego, se divide la expresión anterior por el diferencial de volumen (36), resultando:
+
+\begin{equation}
+     \frac{d\dot{Q_r}}{dr\cdot r\cdot sen(\theta) \cdot d\phi\cdot rd\theta}+ 
+     \frac{d\dot{Q_\phi}}{dr\cdot r\cdot sen(\theta) \cdot d\phi\cdot rd\theta}+
+     \frac{d\dot{Q_\theta}}{dr\cdot r\cdot sen(\theta) \cdot d\phi\cdot rd\theta}+\dot{q_v}=\rho\cdot C_p\cdot \frac{dT}{dt}    
+\end{equation}
+Y dada la ecuacion de Fourier
+\newline
+\begin{equation}
+    \dot{Q_r}    =\lambda \cdot dA_r \cdot \frac{dT}{dl_r}       
+\end{equation}
+\begin{equation}
+    \dot{Q_\theta}    =\lambda \cdot dA_\theta \cdot \frac{dT}{dl_\theta}  
+\end{equation}
+\begin{equation}
+    \dot{Q_\phi}    =\lambda \cdot dA_\phi \cdot \frac{dT}{d\phi}       
+\end{equation}
+Reemplazando (39, (40) y (41) en (38), resulta:
+\begin{equation}
+   \frac{d[\lambda \cdot dA_r \cdot \frac{dT}{dl_r}]}{dr\cdot r\cdot sen(\theta) \cdot d\phi\cdot rd\theta}+ 
+    \frac{d[\lambda \cdot dA_\theta \cdot \frac{dT}{dl_\theta}]}{dr\cdot r\cdot sen(\theta) \cdot d\phi\cdot rd\theta}+
+    \frac{d[\lambda \cdot dA_\phi \cdot \frac{dT}{d\phi}]}{dr\cdot r\cdot sen(\theta) \cdot d\phi\cdot rd\theta}+\dot{q_v}=\rho\cdot C_p\cdot \frac{dT}{dt}     
+\end{equation}
+Luego, se tiene que los diferenciales de area y longitud son los siguientes:
+\begin{equation}
+    dA_r=r\cdot sen(\theta) \cdot d\phi\cdot rd\theta
+\end{equation}
+\begin{equation}
+    dA_\phi=dr \cdot r \cdot d\theta
+\end{equation}
+\begin{equation}
+    dA_\theta=dr\cdot r\cdot sen(\theta) \cdot d\phi
+\end{equation}
+\begin{equation}
+    dl_r=dr
+\end{equation}
+\begin{equation}
+    dl_\phi=r\cdot sen(\theta) \cdot d\phi
+\end{equation}
+\begin{equation}
+    dl_\theta=r\cdot d\theta) 
+\end{equation}
+Reemplazando los diferenciales en la ecuación (42) y desarrollando simples cancelaciones, resulta:
+\begin{equation}
+    \frac{1}{r^2}\frac{d}{dr}[r^2\frac{dT}{dr}]+\frac{1}{r^2\cdot sen^2\theta}\frac{dT}{d\phi ^2}+\frac{1}{r^2sen\theta}\frac{d}{d\theta} [sen\theta\frac{dT}{d\theta}]+\frac{Q_v}{\lambda}=\frac{\rho\cdot C_p}{\lambda}\cdot \frac{dT}{dt}
+\end{equation}
+Por lo que se pudo obtener la ecuación de difusión y transferencia de calor para coordenadas esféricas. En este caso con generación interna y acumulación de energía.
+\newpage
+\subsection{Ecuación Discretización con fuente y con tiempo}
+
+Se toma como consideración:
+
+\begin{itemize}
+    \item Conducción unidimensional.
+    \item Existe generación de energía interna.
+\end{itemize}
+
+\begin{figure}[h]
+\caption{Puntos para discretización del dominio}
+\centering
+\includegraphics[width=0.5\textwidth]{3PUNTOS.png}
+\end{figure}
+Se utiliza la ecuación obtenida en el punto 2.1 de forma simplificada:
+\begin{equation}
+    \frac{\partial}{\partial x} (\lambda \frac{\partial T}{\partial x}) + S = 0
+\end{equation}
+Para la dsicretización se considerarán 3 puntos. W, P y E. Estos pueden observarse en la Figura 2. Para desarrollar la ecuación, se debe integrar (50).
+\begin{equation}
+    \int_W^E \frac{d}{dx} (\lambda \frac{dT}{dx})d_x + \int_W^E S d_x = 0 
+\end{equation}
+Por lo tanto, se puede seguir desarrollando.
+\begin{equation}
+    \lambda \frac{dT}{dx_E} \left|\ _E\right. - \lambda \frac{dT}{dx_w} \left|\ _W\right. + \int_W^E S d_x = 0 
+\end{equation}
+se evalúa y se resulve la integral
+\begin{equation}
+     \frac{ \lambda_E (T_E - T_P)}{dx} - \frac{\lambda_W (T_P - T_W)}{dx} + S\Delta_x= 0
+\end{equation} 
+se separan los terminos
+\begin{equation}
+    \frac{\lambda_E}{dx} T_E - \frac{\lambda_E}{dx} T_P - \frac{\lambda_W}{dx} T_P +\frac{\lambda_W}{dx} T_W + S\Delta_x = 0
+\end{equation}
+y se ordenan las expresiones
+\begin{equation}
+    T_P\cdot (\frac{\lambda_E}{dx} + \frac{\lambda_W}{dx}) = \frac{\lambda_E}{dx}\cdot T_E + \frac{\lambda_W}{dx}\cdot T_W + S \Delta_x
+\end{equation}
+por último, se reemplazan los términos para poder linealizar la expresión.
+\begin{equation}
+    \partial_P \cdot T_P = \partial_E \cdot T_E + \partial_W \cdot T_W + b
+\end{equation}
+Sin embargo, se le debe agregar la variable del tiempo, por lo tanto, la ecuación correcta sería:
+\begin{equation}
+    \frac{\partial}{\partial x} (\lambda \frac{\partial T}{\partial x})  = \rho c \frac{dT}{dt}
+\end{equation}
+Por lo que se tiene una fuente de energía variable con el tiempo. Esta es la ecuacion general de discretización de una dimensión.
+ Por conveniencia se asume que $\rho c$ es constante
+ Se debe integrar la ecuación anterior, resultando:
+\begin{equation}
+   \int_t^{t+{\Delta t}}\int_w^e  \frac{d}{dx} (\lambda \frac{dT}{dx})dxdt = \rho c \int_w^e \int_t^{t+{\Delta t}}\frac{dT}{dt} dtdx 
+\end{equation}
+Resolviendo uno de los lados primero, se obtiene
+\begin{equation}
+    \rho c \int_w^e \int_t^{t+{\Delta t}}\frac{dT}{dt} dtdx =\rho c \Delta x (Tp^1-Tp^0)
+\end{equation}
+Luego, se utiliza la expresión encontrada para la ecuación sin el tiempo y se resuleve el otro lado de la igualdad
+\begin{equation}
+    \rho c \Delta x (Tp^1-Tp^0)=\int_t^{t+{\Delta t}}\left[ \frac{\lambda_E}{dx} T_E +\frac{\lambda_E}{dx} T_P - \frac{\lambda_W}{dx} T_P +\frac{\lambda_W}{dx} T_W \right] dt
+\end{equation}
+se vuelve a integrar
+\begin{equation}
+    \int_t^{t+{\Delta t}} T_p dt =\left[ fT^1_p+(1-f)T^0_p\right]\Delta x
+\end{equation}
+Y luego se tiene una expresión general en términos de los puntos evaluados para la discretización, sin embargo se quiere generalizar aún más.
+\begin{equation}
+    \rho c \frac{\Delta x}{\Delta t} (Tp^1-Tp^0)= f\left[ \frac{\lambda_E(T^1_E-T^1_P)}{dx_E} -\frac{\lambda_w(T^1_P-T^1_W)}{dx_W}\right] +(1-f)\left[ \frac{\lambda_E(T^0_E-T^0_P)}{dx_E} -\frac{\lambda_w(T^0_P-T^0_W)}{dx_W}\right]
+\end{equation}
+Para ello se reemplazan los términos para lograr la linealización de la expresión.
+\begin{equation}
+    a_pT_p=a_E\left[fT_E+(1-f)T^0_E\right]+a_W\left[fT_W+(1-f)T^0_W\right]+\left[a^0_P-(1-f)a_E-(1-f)a_W\right]T^0_P
+\end{equation}
+donde:
+\begin{equation}
+    a_E=\frac{\lambda_E}{(\delta x)_E}
+\end{equation}
+\begin{equation}
+    a_W=\frac{\lambda_W}{(\delta x)_W}
+\end{equation}
+\begin{equation}
+    a^0_P\frac{\rho c \Delta x}{\Delta t}
+\end{equation}
+\begin{equation}
+    a_P=fa_E+fa_W+a^0_P
+\end{equation}
+Logrando así demostrar la ecuación de discretización con fuente generación y transciente.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+\subsection{K en la interfase}
+Para poder entender el comportamiento de conduccion en los materiales compuestos de conductividades no uniformes, se debe considerar que el flujo de calor que ingresa a la interfase es el mismo que sale, es decir
+
+\begin{equation}
+    \dot{Q_e}=\dot{Q_s}
+\end{equation}
+Además, se representará como $\lambda _e$ a la conductividad K  que pasa a travéz de la cara e. Y será correspondiente a los puntos E, P y W cuando $\lambda $ dependa de x.
+\newline
+esto quiere decir que en el límite hacia la izquierda y hacia la derecha es el mismo.
+Por lo que se puede observar que:
+\begin{equation}
+    \frac{\lambda_P(T_e - T_P)}{\delta_{xe-}} = \frac{\lambda_E(T_E - T_e)}{\delta_{xe+}}
+\end{equation}
+Primero se debe asumir una variacion lineal de $\lambda$ entre los puntos E y P. Entonces,
+\begin{equation}
+    \lambda_e=f_e\lambda_p+(1-f_e)\lambda_E
+\end{equation}
+Donde además, se tiene que:
+\begin{equation}
+    f_e=\frac{(\delta x)_e+}{(\delta x)_e}
+\end{equation}
+el flujo de calor puede representarse como:
+\begin{equation}
+    q_e=\frac{\lambda _e(T_E - T_P)}{\delta_{xe}}
+\end{equation}
+Y suponiendo que los alrededores a la conductividad de cada volumen de control para los puntos P y E es uniforme, se puede demostrar que,
+\begin{equation}
+    q_e=\frac{(T_P-T_E)}{\frac{(\delta x)_e-}{\lambda_P}+\frac{(\delta x)_e+}{\lambda_E}}
+\end{equation}
+\newline
+Combinando las ecuaciones (71) y (73) nos queda la ecuación:
+\begin{equation}
+    \lambda _e= \left( {\frac{1-f_e}{\lambda _P}+\frac{f_e}{\lambda _E}}\right)^{-1}
+\end{equation}
+\newline
+suponiendo que se tiene $f_e=0.5$, entonces,
+\begin{equation}
+    \lambda ^{-1}_e=0,5(\lambda^{-1}_P+\lambda^{-1}_E)
+\end{equation}
+o de la misma forma,
+\begin{equation}
+    \lambda_e=\frac{2\lambda_E\lambda_P}{\lambda_P+\lambda_E}
+\end{equation}
+Ecuación que demostraría que $\lambda_e$ es la media armónica de $\lambda_P$ y $\lambda_E$.
+
+\newpage
+\subsection{Schemes EDS}
+EDS Representa a Exponential Schemes, por lo que se explicará en base a este.
+\newline
+Primero, es necesario considerar un flujo total $J$ el que esta compuesto de el flujo convectivo y el difusivo.
+\begin{equation}
+    J=\rho u \phi - \Gamma \frac{d\phi}{dx}
+\end{equation}
+donde el flujo convectivo es,
+\begin{equation}
+    \rho u \phi
+\end{equation}
+mientras que el flujo difusivo es,
+Y por otro lado, el flujo de calor que representa la difusión:
+\begin{equation}
+    -\Gamma \cdot \frac{d\phi}{dx}
+\end{equation} 
+y dada la ecuacion diferencial gobernante,
+\begin{equation}
+    \frac{d}{dx}(\rho u \phi)=\frac{d}{dx} \left(\Gamma \frac{d\phi}{dx}\right)
+\end{equation}
+
+Por lo anterior, la ecuacion gobernante en este caso se vuelve,
+\begin{equation}
+    \frac{dJ}{dx}=0,
+\end{equation}
+Donde,
+\begin{equation}
+    J_e - J_w=0
+\end{equation}
+y también, 
+\begin{equation}
+    J_e=F_e\left(\phi_P+\frac{\phi_P - \phi_E}{e^{P_e} - 1}\right)
+\end{equation}
+donde,
+\begin{equation}
+    P_e=\frac{(\rho u)_e(\delta x)_e}{\Gamma_e}=\frac{F_e}{D_e},
+\end{equation}
+Además, es notorio que,
+\begin{equation}
+    \rho u \phi = \Gamma \cdot \frac{d\phi}{dx}
+\end{equation}
+Y utilizando la solución exacta de (82), 
+\begin{equation}
+    \frac{\phi - \phi_0}{\phi_L - \phi_0} = \frac{e^{Px/L}-1}{e^P - 1}
+\end{equation}
+Sin embargo, debe conocerce P, el cual es un número de Peclet definido por:
+\begin{equation}
+    P=\frac{\rho u L}{\Gamma}
+\end{equation}
+
+Luego, se deben integrar las ecuaciones para resultar:
+\begin{equation}
+    F_e\left(\phi_P+\frac{\phi_P - \phi_E}{e^{P_e} - 1}\right) - F_w\left(\phi_w+\frac{\phi_W - \phi_P}{e^{P_w} - 1}\right)=0
+\end{equation}
+\newline
+Esta ecuacion puede ser representada en su forma standar, la cual se muestra a conntinuación
+\begin{equation}
+    a_P\phi_P = a_E\phi_E + a_W \phi_W
+\end{equation}
+
+Donde:
+\begin{equation}
+    a_E=\frac{F_e}{e^{\frac{F_e}{D_e}}-1}
+\end{equation}
+\begin{equation}
+    a_W=\frac{F_w e^{\frac{F_e}{D_e}}}{e^{\frac{F_e}{D_e}}-1}
+\end{equation}
+\begin{equation}
+    a_P = a_E + a_W + (F_e - F_w)
+\end{equation}
+
+\newpage
+\end{document}
